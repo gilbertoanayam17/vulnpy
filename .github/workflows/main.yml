@@ -15,4 +15,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo "This is a test step"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Safety
+          path: archivo
+        if: always()
     needs: build
