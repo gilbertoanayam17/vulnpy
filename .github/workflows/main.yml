@@ -27,7 +27,20 @@ jobs:
     needs: test
     steps:
       - uses: actions/checkout@v2
-      - run: docker run --rm -v $(pwd):/src hysnsec/safety check -r ./tests/requirements.txt --json | tee sca-results.json
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Safety ignores unpinned requirements (and "Werkzeug==2.2.*"), so resolve
+      # the real dependency tree first and scan the exact installed versions.
+      - name: Resolve dependencies
+        run: |
+          python -m venv .sca-venv
+          .sca-venv/bin/pip install -r tests/requirements.txt
+          .sca-venv/bin/pip freeze > requirements-frozen.txt
+
+      - run: docker run --rm -v $(pwd):/src hysnsec/safety check -r ./requirements-frozen.txt --json | tee sca-results.json
         continue-on-error: true
  
       - uses: actions/upload-artifact@v4
