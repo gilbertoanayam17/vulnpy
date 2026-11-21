@@ -35,3 +35,11 @@ jobs:
           name: Safety
           path: sca-results.json
         if: always()
+
+      - name: Upload SCA results to DefectDojo
+        if: always()
+        env:
+          DEFECTDOJO_URL: ${{ secrets.DEFECTDOJO_URL }}
+          DEFECTDOJO_API_KEY: ${{ secrets.DEFECTDOJO_API_KEY }}
+          DEFECTDOJO_AUTH_HEADER: ${{ secrets.DEFECTDOJO_AUTH_HEADER }}
+        run: bash scripts/upload_defectdojo.sh sca-results.json "Safety Scan"
